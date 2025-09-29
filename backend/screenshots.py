@@ -1,7 +1,7 @@
 import os
 import time
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
@@ -124,8 +124,8 @@ def close_shortcut_overlay(driver, timeout=3):
 
 
 
-def _now_date_ddmmyyyy():
-    return datetime.now().strftime("%d-%m-%Y")  # dd-mm-yyyy
+def _now_datetime():
+    return datetime.now(timezone.utc)
 
 def _now_date_yyyymmdd():
     return datetime.now().strftime("%Y-%m-%d")  # yyyy-mm-dd
@@ -188,10 +188,10 @@ def _highlight_and_url_banner(driver, el, url_text: str):
             }
         `;
 
-        // URL-Banner unten mit Zeitstempel
+        // URL-Banner unten mit UTC-Zeitstempel
         let banner = document.getElementById(bannerId);
         if (!banner) {
-            const timestamp = new Date().toLocaleString("de-DE");
+            const timestamp = new Date().toISOString().replace(/\\.\\d{3}Z$/, "Z");
 
             banner = document.createElement("div");
             banner.id = bannerId;
@@ -221,6 +221,8 @@ def _highlight_and_url_banner(driver, el, url_text: str):
         }
         return [className, bannerId];
     """, el, class_name, banner_id, url_text)
+
+    return class_name, banner_id
 
 
     return class_name, banner_id
